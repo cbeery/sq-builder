@@ -25,6 +25,18 @@ ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "template"
 
 
+def show(path: Path) -> str:
+    """A readable path. The builder and the content are separate trees
+    now, so nothing can be assumed to sit under ROOT — try the working
+    directory first, then ROOT, then give the absolute path."""
+    for base in (Path.cwd(), ROOT):
+        try:
+            return str(path.relative_to(base))
+        except ValueError:
+            continue
+    return str(path)
+
+
 def _content_root() -> Path:
     """Where the issues live.
 
@@ -99,7 +111,7 @@ def cmd_new(args) -> int:
         margin_outside=f"{g['margin_outside']:g}")
     (path / "issue.yaml").write_text(text, encoding="utf-8")
 
-    print(f"created {path.relative_to(ROOT)}")
+    print(f"created {show(path)}")
     print("\nnext:")
     print(f"  1. drop the wordmark PNG into {path.name}/images/sq-mark.png")
     print(f"  2. drop cover art into {path.name}/images/")
@@ -132,8 +144,8 @@ def cmd_add(args) -> int:
         print(f"\n  {exc}\n", file=sys.stderr)
         return 1
 
-    print(f"wrote {path.relative_to(ROOT)}")
-    print(f"added to {(issue_dir / 'issue.yaml').relative_to(ROOT)}")
+    print(f"wrote {show(path)}")
+    print(f"added to {show((issue_dir / 'issue.yaml'))}")
     print("\nnow, by hand:")
     print("  - write the bio (never scraped, never inferred)")
     print("  - check any <!-- REVIEW --> comments")
@@ -147,7 +159,7 @@ def _build(issue_dir: Path, proof: bool, screen: bool = False) -> Path:
     pdf = render.build(issue_dir, OUT, proof=proof, screen=screen)
     from pypdf import PdfReader
     n = len(PdfReader(str(pdf)).pages)
-    print(f"{pdf.relative_to(ROOT)}  —  {n} pages  {time.time() - t0:.2f}s")
+    print(f"{show(pdf)}  —  {n} pages  {time.time() - t0:.2f}s")
     return pdf
 
 
@@ -171,7 +183,7 @@ def cmd_build(args) -> int:
             print("`sq preflight` is the gate, and it exits non-zero.")
         return 0
 
-    print(f"watching {issue_dir.relative_to(ROOT)} — ctrl-c to stop")
+    print(f"watching {show(issue_dir)} — ctrl-c to stop")
     last = None
     while True:
         now = fingerprint(issue_dir)
@@ -242,7 +254,7 @@ def cmd_drill(args) -> int:
     path = ISSUES / DRILL
     if path.exists():
         if not args.reset:
-            print(f"{path.relative_to(ROOT)} already exists.")
+            print(f"{show(path)} already exists.")
             print("Carry on adding to it, or start over with "
                   "`sq drill --reset`.")
             return 0
@@ -263,7 +275,7 @@ def cmd_drill(args) -> int:
     text = text.replace("  - articles/01-dialect.md\n", "")
     (path / "issue.yaml").write_text(text, encoding="utf-8")
 
-    print(f"created {path.relative_to(ROOT)} (gitignored)\n")
+    print(f"created {show(path)} (gitignored)\n")
     print("Now, for each article you want to practise with:")
     print(f"  pbpaste | sq add {DRILL} --paste - --url https://...\n")
     print("Then:")
