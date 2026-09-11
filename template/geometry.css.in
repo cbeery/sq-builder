@@ -1,0 +1,38 @@
+/* Stan Quarterly — page geometry.
+ *
+ * Generated from issue.yaml by sq/render.py; $$placeholders are substituted
+ * with string.Template. This file exists so that changing the trim size is
+ * an issue.yaml edit and nothing else: sq.css holds the design, this holds
+ * the numbers, and preflight reads the same values back off the issue.
+ *
+ * Do not put design decisions in here.
+ */
+
+:root {
+  --trim-w: ${trim_w}pt;
+  --trim-h: ${trim_h}pt;
+  --bleed: ${bleed}pt;
+  --quiet: ${quiet}pt;
+  --margin-top: ${margin_top}pt;
+  --margin-bottom: ${margin_bottom}pt;
+  --margin-inside: ${margin_inside}pt;
+  --margin-outside: ${margin_outside}pt;
+  /* trim height less the top and bottom margins — the contents page is
+     sized to this explicitly because `height: 100%` does not resolve
+     against the page box in WeasyPrint. */
+  --content-h: ${content_h}pt;
+}
+
+/* size = TRIM. `bleed` extends the media box beyond it, so the printer
+   receives a ${trim_w} x ${trim_h}pt trim inside a ${media_w} x ${media_h}pt page. */
+@page {
+  size: ${trim_w}pt ${trim_h}pt;
+  bleed: ${bleed}pt;
+  marks: ${marks};
+  margin: ${margin_top}pt ${margin_outside}pt ${margin_bottom}pt ${margin_inside}pt;
+}
+
+/* Mirrored gutter: on a left-hand page the inside margin is on the right. */
+@page :left {
+  margin: ${margin_top}pt ${margin_inside}pt ${margin_bottom}pt ${margin_outside}pt;
+}

@@ -1,0 +1,15 @@
+/* Screen build only, loaded after sq.css.
+ *
+ * A PDF read on a screen has no binding, so the gutter it exists to
+ * protect is not there. The margins are made symmetric in the generated
+ * geometry — at the mean of inside and outside, which keeps the column
+ * exactly as wide, so the text sets identically and the pagination
+ * matches the print build page for page.
+ *
+ * All that is left here is the folio, which would otherwise still jump
+ * from side to side and read as a fault once the margins no longer move.
+ */
+@page :left {
+  @bottom-left { content: none; }
+  @bottom-right { content: counter(page); }
+}

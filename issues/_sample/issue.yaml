@@ -1,0 +1,54 @@
+# A sample issue, not a real one.
+#
+# It exists so the whole dialect stays exercised: every construct the
+# parser understands appears in articles/01-dialect.md, and the test
+# suite builds this issue and runs preflight over it on every `make test`.
+# If a construct silently stops working, this is what catches it.
+#
+# All artwork here is generated placeholder art, sized to the real print
+# resolution so `sq preflight _sample` comes back with zero FAILs — which
+# is also a worked demonstration of what a clean run looks like.
+#
+# Directories starting with `_` are skipped when `sq` picks a default
+# issue, so this never gets built by accident.
+
+title: Stan Quarterly
+abbr: SQ
+issue: Sample
+subtitle: A worked example of the dialect
+colophon: Placeholder art. No reprinted content in this issue.
+
+# NOT the SQ wordmark. The real mark is supplied artwork and is not
+# duplicated into this fixture — a second copy would drift the moment it
+# gets re-exported. This is a placeholder shape at print resolution.
+mark:
+  image: images/mark-placeholder.png
+
+cover:
+  image: images/cover.jpg
+  focus: center
+  stamp: Dialect Sample
+back_cover:
+  image: images/back-cover.jpg
+  focus: center
+
+trim:
+  width_pt: 481.68
+  height_pt: 737.28
+bleed_pt: 9.0
+quiet_pt: 18.0
+
+margins_pt:
+  top: 46
+  bottom: 42
+  inside: 54
+  outside: 44
+
+theme:
+  accent: "#2FC79A"
+  ink: "#111111"
+  muted: "#6E6E6E"
+  rule: "#D8D8D8"
+
+articles:
+  - articles/01-dialect.md

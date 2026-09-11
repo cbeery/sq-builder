@@ -1,0 +1,17 @@
+# build output
+out/
+**/generated/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# a practice run pastes real reprinted articles — keep them out of the repo
+issues/_drill/
+
+# macOS
+.DS_Store

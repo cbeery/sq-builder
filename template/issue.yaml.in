@@ -1,0 +1,48 @@
+title: Stan Quarterly
+abbr: SQ
+issue: ${issue_name}
+subtitle: Compiled by Curt, for Stan
+colophon: All content reprinted without permission. Oh well.
+
+# The SQ wordmark is ALWAYS supplied artwork, never set in type. It is
+# Mazzard H Black with a distinctive angled Q tail; a substitute grotesque
+# is visibly wrong. Required — a missing file is a hard build error.
+# Copy the transparent PNG in from the previous issue.
+mark:
+  image: images/sq-mark.png
+
+# ONE finished image per cover. The build never assembles a composite: its
+# jobs are to fill the bleed, honour `focus`, and draw the wordmark and
+# stamp over the top. Supply roughly ${ideal_px} px
+# (${ideal_in} in at 300 ppi) so nothing is lost to the crop.
+# focus: center | top | bottom | left | right | "50% 30%"
+cover:
+  image: images/cover.jpg
+  focus: center
+back_cover:
+  image: images/back-cover.jpg
+  focus: center
+
+# Verified against the printed Summer 2026 issue as ordered from Mixam.
+# Changing these means a new order spec — see docs/MIXAM-RUNBOOK.md.
+trim:
+  width_pt: ${trim_w}
+  height_pt: ${trim_h}
+bleed_pt: ${bleed}
+quiet_pt: ${quiet}
+
+margins_pt:
+  top: ${margin_top}
+  bottom: ${margin_bottom}
+  inside: ${margin_inside}
+  outside: ${margin_outside}
+
+theme:
+  accent: "#2FC79A"
+  ink: "#111111"
+  muted: "#6E6E6E"
+  rule: "#D8D8D8"
+
+# Order here is the order in the magazine and in the contents.
+# `sq add` appends to this list.
+articles:
