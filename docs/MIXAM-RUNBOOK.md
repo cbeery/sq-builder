@@ -76,6 +76,91 @@ Do not upload the `sq proof` output — that one carries crop marks.
 
 ---
 
+## What the interface actually does
+
+Written down from ordering Fall 2026, because the site does several
+things that are not where you would look for them.
+
+**The progress bar is the navigation.** Across the top:
+
+```
+Cart → Artwork → Payment → Confirm → Printing → Shipped
+```
+
+There are no in-page "Continue" or "Next" buttons between these stages.
+You click the step itself. That is unusual and it is easy to spend ten
+minutes hunting for a button that does not exist. Clicking a step cannot
+place or commit anything.
+
+**The artwork upload does not appear until after Cart.** Configure,
+add to cart, and only then does the Artwork stage exist. Looking for an
+upload control on the calculator page is looking too early.
+
+**Upload processing takes up to fifteen minutes** for a full-colour
+issue. The page refreshes itself; nothing to watch.
+
+**The long block of illustrated FAQ at the bottom of the artwork page is
+page furniture.** Nothing actionable is down there. Scroll back up.
+
+**Payment comes before Confirm, and paying does not commit you.** Mixam's
+own wording: you can cancel before confirming and the payment is refunded
+automatically. The press only starts at Confirm.
+
+### The delivery address carries forward silently
+
+The ZIP from the previous order is applied to the new one with no
+prompt. On the cart page the only sign is the **tax line** — for Fall
+2026 it read `Tax (IN - NORTH MANCHESTER, WABASH)`, which is Stan's
+address, on an order meant for Colorado.
+
+**Change it with "Change ZIP Code" in the Your Quote panel**, under the
+country dropdown. Check the tax line changed. This is the one mistake on
+this page that cannot be undone after Confirm.
+
+### How Mixam splits the PDF
+
+With Add Cover, the single uploaded file is divided like this. Worth
+knowing because it is how you verify the blanks landed correctly:
+
+| Mixam calls it | PDF page |
+|---|---|
+| Outer front cover | 1 |
+| Inner front cover | 2 |
+| Body page 1 | 3 |
+| Body page N | N + 2 |
+| Inner back cover | second to last |
+| Outer back cover | last |
+
+So for a 40-page file: 36 body pages, and "Body page 35" is the about
+page on PDF page 37. A `40 out of 40 positions — 100%` indicator confirms
+nothing is missing.
+
+### Warnings
+
+Mixam's low-resolution threshold is **101 ppi**, and it reports the same
+condition once per affected page rather than once per image — Fall 2026
+showed twenty-three identical warnings for a single 92 ppi cover. To
+find out what is actually being flagged, check the file directly rather
+than counting the list:
+
+```bash
+pdfimages -list out/SQ_Fall_2026_*.pdf | awk 'NR>2 && $13+0 < 101'
+```
+
+Warnings do not block printing. The file prints as supplied.
+
+### Decline AI Image Enhance
+
+Mixam offers to upscale low-resolution images automatically. **Do not
+take it.** Upscaling does not recover detail that was never captured, it
+invents plausible detail, and on a soft-focus photograph that reads as
+waxy skin and over-sharpened edges.
+
+It also defeats the point of the proof copy: the copy exists to show what
+the artwork genuinely looks like on paper. If the service quietly
+improves it, the decision about the second copy is made on a different
+image. Check the cover thumbnail before confirming.
+
 ## Order one: the proof copy, to yourself
 
 Do this with the runbook open. It takes about fifteen minutes.
