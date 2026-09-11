@@ -74,6 +74,15 @@ Content is found by looking outward: `SQ_ISSUES` if set, otherwise an
 bundled sample. So the private content repository keeps its own
 `issues/`, installs this one, and `sq build` works from there.
 
+## Documentation
+
+- [`docs/ARTICLE-INGESTION.md`](docs/ARTICLE-INGESTION.md) — getting an
+  article out of a browser, and why an RTFD bundle is the route that
+  carries the photographs
+- [`docs/MIXAM-RUNBOOK.md`](docs/MIXAM-RUNBOOK.md) — ordering, the
+  page-count arithmetic, and why every issue is printed twice
+- [`docs/BUILD-SPEC.md`](docs/BUILD-SPEC.md) — the full brief
+
 ## Requirements
 
 Python 3.12+, and on macOS the native libraries WeasyPrint wraps:

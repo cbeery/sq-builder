@@ -110,6 +110,35 @@ thumbnails.
 
 ---
 
+## Order it twice
+
+Every issue is printed twice, and the first one is a proof:
+
+1. Build the issue and get `sq preflight` to zero FAILs.
+2. Order **one copy, delivered to yourself.**
+3. Read the physical copy properly when it arrives.
+4. Fix whatever it shows, rebuild, then order the copy for Stan.
+
+This is not caution for its own sake. There is a whole category of
+problem that no preflight and no on-screen proof can catch, because it
+only exists on paper:
+
+- **Colour.** The build outputs RGB and the press is CMYK. Saturated
+  single hues move the most, and a cover built around one is exactly the
+  case that shifts.
+- **Soft images.** Preflight reports effective PPI, but only the print
+  tells you whether 125 ppi on a period photograph reads as character or
+  as a mistake.
+- **The gutter.** Whether the inside margin is genuinely enough once the
+  staples are in and the thing does not want to lie flat.
+- **Ink density.** Heavy dark pages showing through the leaf behind them.
+- **Trim drift.** Where the blade actually fell, against where the art
+  assumed it would.
+
+Order the second copy as a **reorder** of the first, so the specification
+is cloned rather than re-entered, and change only the delivery address
+and the file. See below.
+
 ## Making the next issue trivial
 
 **Reorder is the whole trick.** Order History → find Summer 2026 → **Reorder**.
@@ -149,7 +178,7 @@ should show zero FAILs, then confirm by eye:
 - [ ] No `# TODO` anywhere — preflight fails on these now
 - [ ] All images present, none flagged MISSING
 - [ ] Proof downloaded and read in Acrobat with Overprint Preview on
-- [ ] Delivery address is right
+- [ ] Delivery address is right — **yourself for the proof copy, Stan for the real one**
 
 ---
 
