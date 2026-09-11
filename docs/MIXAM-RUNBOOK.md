@@ -76,6 +76,80 @@ Do not upload the `sq proof` output — that one carries crop marks.
 
 ---
 
+## Order one: the proof copy, to yourself
+
+Do this with the runbook open. It takes about fifteen minutes.
+
+**Before you start**, open Order History and look at the previous issue.
+Write down two things: the **cover option** it was ordered with, and the
+**paper**. You need the cover option before you can type a page count,
+and it is the single easiest thing to get wrong.
+
+1. **Instant Quote Calculator.** Set:
+
+   | Field | Value |
+   |---|---|
+   | Product | Magazine |
+   | Size | Custom — **6.69 × 10.24 in** (170 × 260 mm) |
+   | Pages | **see step 2** |
+   | Binding | Saddle-stitch (staple) |
+   | Colour | Full colour throughout |
+   | Paper | same as last issue |
+   | Quantity | **1** |
+
+2. **Pages.** Run `sq preflight` and read the three numbers off the end
+   of it. Enter the one matching the cover option you just looked up —
+   **not** the number of pages in the PDF, unless the order is
+   self-cover. Getting this wrong is the mistake that reprints an issue.
+
+3. Add to cart, continue to the **Artwork** tab.
+
+4. **Upload the one PDF.** The file with neither `_proof` nor `_screen`
+   in its name. Covers are included in it; do not upload them separately.
+
+5. **Check every page thumbnail is filled.** A grey one marked "Artwork
+   Missing" blocks the proof.
+
+6. **Check the bleed guides.** The uploader draws a blue bleed line and a
+   green trim line over your pages. Confirm the cover art actually
+   reaches the blue line on both covers.
+
+7. **Preview** — the flipbook. Look for pages in the wrong order, a
+   missing spread, a gutter mirrored the wrong way.
+
+8. **PDF Proof.** Click Proof, wait for the checkmark, click again to
+   open, then **download it and open in Acrobat** — not the browser —
+   with Overprint Preview on.
+
+9. **Delivery address: yourself.**
+
+10. **Confirm.** Cut-off is 4pm CT on workdays; after that the ship date
+    moves.
+
+## Order two: Stan's copy
+
+Only after the proof copy has arrived and you have read it. If it showed
+anything, fix it, rebuild, and get `sq preflight` back to zero FAILs
+first.
+
+1. **Order History → find the proof order → Reorder.** This clones the
+   whole specification, so you do not re-derive size, binding, paper or
+   the page-count arithmetic.
+
+2. **Replace the PDF** if you changed anything. If you did not, leave it.
+
+3. **Change the delivery address to Stan's.** This is the one Mixam
+   themselves flag as the common reorder mistake, and a reorder carries
+   the old address forward silently.
+
+4. **Check the page count** if the issue changed length. That is a
+   specification change, not just a file swap.
+
+5. Proof, then confirm.
+
+If you reordered pages by dragging thumbnails at any point, un-confirming
+can revert them — fix page order in the source and re-upload instead.
+
 ## Ordering, step by step
 
 1. **Instant Quote Calculator** — set the spec above, get a price and an
