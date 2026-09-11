@@ -175,7 +175,14 @@ def cmd_build(args) -> int:
         return 0
 
     if not args.watch:
+        # Both, every time. You want the print file to upload and the
+        # screen file to send people, and having only one of them in out/
+        # is how the wrong one gets sent.
         pdf = _build(issue_dir, proof=False)
+        if not args.print_only:
+            _build(issue_dir, proof=False, screen=True)
+            print("   print: mirrored gutter — this is the one to upload")
+            print("  screen: symmetric margins — this is the one to send")
         print()
         clean = preflight.run(issue_dir, pdf)
         if not clean:
@@ -421,8 +428,10 @@ def main(argv=None) -> int:
     p.add_argument("issue", nargs="?")
     p.add_argument("--watch", action="store_true", help="rebuild on save")
     p.add_argument("--screen", action="store_true",
-                   help="symmetric margins for on-screen reading; not for "
+                   help="only the screen build: symmetric margins, not for "
                         "the printer")
+    p.add_argument("--print-only", action="store_true",
+                   help="skip the screen build")
     p.set_defaults(fn=cmd_build)
 
     p = sub.add_parser("preflight", help="check an issue before upload")

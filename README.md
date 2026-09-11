@@ -18,7 +18,7 @@ your magazine unchanged.
 ```bash
 sq new 2027-spring          # scaffold an issue
 sq add 2027-spring --paste - --url https://...   # ingest an article
-sq build 2027-spring        # render the print PDF, then preflight it
+sq build 2027-spring        # render print AND screen, then preflight
 sq preflight 2027-spring    # the gate before upload; non-zero on FAIL
 sq proof 2027-spring        # same, with crop marks, for reading on screen
 sq doctor                   # are the fonts actually resolving?
