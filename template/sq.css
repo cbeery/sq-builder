@@ -33,14 +33,36 @@
    how it looks. Page number bottom-OUTSIDE, so it mirrors on left pages. */
 /* Both margin boxes are styled once; only `content` says which side the
    folio actually appears on. That is what lets the screen build swap
-   sides without restating the design. */
+   sides without restating the design.
+
+   The design is carried in custom properties rather than in a shared
+   `@bottom-left, @bottom-right { ... }` rule, because WeasyPrint drops a
+   comma-grouped margin-box selector entirely. It fails silently and in
+   the worst way: `content` is declared separately below, so the folio
+   still printed — unstyled, in the 12pt default serif, which is how
+   Times New Roman got into an issue that sets no Times anywhere.
+   Properties set on `@page` DO inherit into the margin boxes, so the
+   values below are written once and both sides pick them up. */
 @page {
-  @bottom-left, @bottom-right {
-    font-family: var(--cond-face);
-    font-size: 8.5pt;
-    font-style: italic;
-    color: var(--muted);
-    margin-bottom: 14pt;
+  --folio-face: var(--cond-face);
+  --folio-size: 8.5pt;
+  --folio-style: italic;
+  --folio-color: var(--muted);
+  --folio-lift: 14pt;
+
+  @bottom-left {
+    font-family: var(--folio-face);
+    font-size: var(--folio-size);
+    font-style: var(--folio-style);
+    color: var(--folio-color);
+    margin-bottom: var(--folio-lift);
+  }
+  @bottom-right {
+    font-family: var(--folio-face);
+    font-size: var(--folio-size);
+    font-style: var(--folio-style);
+    color: var(--folio-color);
+    margin-bottom: var(--folio-lift);
   }
   @bottom-right { content: counter(page); }
 }

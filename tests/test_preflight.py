@@ -186,3 +186,58 @@ def test_warns_once_the_issue_is_too_thick_to_staple(tmp_path, capsys):
     assert "perfect binding" in out
     assert "spine" in out
     assert rep.fails == 0, "too thick to staple is a warning, not a failure"
+
+
+# --- fonts that nothing asked for --------------------------------------------
+
+def test_a_substituted_family_fails():
+    """Fall 2026 went to print with its folios in Times New Roman: a
+    comma-grouped margin-box rule was dropped, the engine fell back to
+    the default serif, and every existing font check passed it. Times
+    embedded cleanly and is not a colour font, so "did it embed?" and
+    "is it a colour font?" both said OK. Only "did we ask for it?"
+    catches this."""
+    from sq.preflight import Report, check_font_families
+    rep = Report()
+    fonts = {"ESSOFH+Times-New-Roman,": True, "RATJMB+Charter": True}
+    check_font_families(fonts, {}, rep)
+    assert rep.fails == 1
+
+
+def test_weight_and_width_names_are_not_strangers():
+    """Pango describes a face by weight and width class, so the real
+    names carry suffixes the stylesheet never wrote. Matching is on the
+    family stem; insisting on an exact name would fail every build."""
+    from sq.preflight import Report, check_font_families
+    rep = Report()
+    fonts = {
+        "KRCJNX+Mazzard-Heavy-Semi-Condensed": True,
+        "FBPJSG+Avenir-Next-Condensed,-Condensed": True,
+        "OXCVCS+Charter-Small-Caps": True,
+        "MAQJFT+Avenir-Next-Condensed,-Medium-Condensed": True,
+    }
+    check_font_families(fonts, {}, rep)
+    assert rep.fails == 0
+
+
+def test_accepting_a_family_downgrades_it(capsys):
+    """Same escape hatch as the covers: a family that is genuinely
+    wanted is recorded once in issue.yaml rather than left as a standing
+    FAIL that stops being read."""
+    from sq.preflight import Report, check_font_families
+    rep = Report()
+    fonts = {"ABCDEF+Times-New-Roman,": True}
+    check_font_families(fonts, {"fonts": {"accept": ["Times New Roman"]}}, rep)
+    assert rep.fails == 0
+    assert rep.warns == 1
+    assert "accepted in issue.yaml" in capsys.readouterr().out
+
+
+def test_accepting_one_family_does_not_excuse_another():
+    """The list is per-family, not a blanket amnesty."""
+    from sq.preflight import Report, check_font_families
+    rep = Report()
+    fonts = {"ABCDEF+Times-New-Roman,": True, "GHIJKL+Comic-Sans-MS": True}
+    check_font_families(fonts, {"fonts": {"accept": ["Times New Roman"]}}, rep)
+    assert rep.fails == 1
+    assert rep.warns == 1

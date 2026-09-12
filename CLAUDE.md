@@ -5,8 +5,8 @@ writing code; this file is the short list of things that must not drift.
 
 ## What this is
 
-The build pipeline for Stan Quarterly: a one-off print magazine, three or
-four articles per issue, four issues a year, compiled for one reader.
+The build pipeline for Stan Quarterly: a one-off print magazine, a few
+articles per issue, four issues a year, compiled for one reader.
 Articles are reprinted from the web. Output is a print-ready PDF uploaded
 to Mixam.
 
@@ -98,12 +98,23 @@ Quirks worked around in `template/sq.css`, all commented in place:
 - there is no `text-shadow` and no `filter`
 - `overflow: hidden` is dropped below a float, not set beside it
 - crop marks are drawn inside the bleed, not outside it
+- a comma-grouped margin-box selector (`@bottom-left, @bottom-right
+  { ... }`) is dropped in full, so each margin box must be written
+  out on its own. Properties set on `@page` do inherit into them,
+  which is how the folio design stays declared once
 
 ## Before every upload
 
 `sq preflight` must show zero FAILs. It checks image PPI **at placed
 size** (cover art measured after cover-fill scaling), page count, the
-media/trim/bleed boxes, font embedding, colour glyphs, missing images and
-TODOs. It also prints the number to type into Mixam's calculator, which
-is **not** the PDF's page count when a separate cover is ordered, and
-warns once the issue outgrows saddle stitching.
+media/trim/bleed boxes, font embedding, **that every embedded family is
+one of the five declared roles**, colour glyphs, missing images and
+TODOs. That family check exists because embedding and colour-font checks
+both pass a silent substitution cleanly — Fall 2026 printed its folios in
+Times New Roman and nothing said a word. A family that is genuinely
+wanted goes in `fonts.accept` in the issue's settings, the same way a
+soft cover is accepted, rather than being left as a standing FAIL.
+
+It also prints the number to type into Mixam's calculator, which is
+**not** the PDF's page count when a separate cover is ordered, and warns
+once the issue outgrows saddle stitching.

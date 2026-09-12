@@ -20,6 +20,7 @@ from string import Template
 
 from . import __version__
 from .content import ContentError, resolve_geometry
+from .preflight import FONT_ROLES, _first_family, _norm, font_matches
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "template"
@@ -239,17 +240,6 @@ def cmd_proof(args) -> int:
 
 DRILL = "_drill"
 
-# Every role the stylesheet declares. --ui-face is unused at present but
-# still probed: if furniture ever wants its own voice back, it should be
-# a one-line change and not a discovery that the font went missing.
-FONT_ROLES = [
-    ("Headline", "--display-face", 900),
-    ("Subhead", "--display-alt", 700),
-    ("Body", "--body-face", 400),
-    ("Furniture", "--cond-face", 400),
-    ("Unused", "--ui-face", 400),
-]
-
 
 def cmd_drill(args) -> int:
     """Scaffold a throwaway issue for a practice run.
@@ -324,22 +314,6 @@ def probe_font(role: str, var: str, weight: int) -> set:
     return set(embedded_fonts(PdfReader(buf)))
 
 
-def font_matches(wanted: str, got: str) -> bool:
-    """Did we get the family we asked for, or a fallback?
-
-    Compares the family stem rather than the whole name. Pango describes
-    a face by weight and width class, not by its full name, so
-    `Mazzard H Black` legitimately comes back as
-    `Mazzard-Heavy-Semi-Condensed` — the OTF has family "Mazzard",
-    weight 900, width class 4. Insisting on an exact match reports a
-    false failure on a font that is installed and correct.
-
-    What actually needs catching is the family going missing on a fresh
-    machine and the engine silently reaching for a fallback.
-    """
-    return _norm(wanted.split()[0]) in _norm(got)
-
-
 def cmd_doctor(args) -> int:
     """Is the toolchain sound? Mostly: do the five faces actually
     resolve, or is the engine quietly substituting?"""
@@ -382,23 +356,6 @@ def cmd_doctor(args) -> int:
 
     print(f"\n{'ALL GOOD' if ok else 'PROBLEMS FOUND'}")
     return 0 if ok else 1
-
-
-def _norm(s: str) -> str:
-    return "".join(c for c in s.lower() if c.isalnum())
-
-
-def _first_family(var: str) -> str:
-    """The first family named in a custom property in sq.css — the one
-    that is actually wanted, before the fallbacks."""
-    import re
-
-    from .render import STYLESHEET
-    css = STYLESHEET.read_text(encoding="utf-8")
-    m = re.search(rf"{re.escape(var)}\s*:\s*([^;]+);", css)
-    if not m:
-        return "?"
-    return m.group(1).split(",")[0].strip().strip('"').strip()
 
 
 # --- entry point -----------------------------------------------------------

@@ -37,6 +37,15 @@ margins_pt:
   inside: ${margin_inside}
   outside: ${margin_outside}
 
+# Preflight FAILs on any embedded font family that is not one of the five
+# roles sq.css declares, because a silent substitution passes every other
+# font check cleanly. If a family really is wanted, name it here and the
+# FAIL becomes an acknowledged WARN. Matching is on the family stem, so
+# "Times New Roman" covers the weight and width variants too.
+# fonts:
+#   accept:
+#     - Times New Roman
+
 theme:
   accent: "#2FC79A"
   ink: "#111111"

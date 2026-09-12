@@ -247,6 +247,54 @@ def check_glyphs(issue: dict, rep: Report):
         rep.note("OK", "no colour-emoji glyphs in the source text")
 
 
+# --- font roles ------------------------------------------------------------
+# Shared with `sq doctor`, which probes the same roles against a test
+# render. Kept here because preflight is the gate: cli imports from
+# preflight and not the other way round.
+
+# Every role the stylesheet declares. --ui-face is unused at present but
+# still probed: if furniture ever wants its own voice back, it should be
+# a one-line change and not a discovery that the font went missing.
+FONT_ROLES = [
+    ("Headline", "--display-face", 900),
+    ("Subhead", "--display-alt", 700),
+    ("Body", "--body-face", 400),
+    ("Furniture", "--cond-face", 400),
+    ("Unused", "--ui-face", 400),
+]
+
+
+def font_matches(wanted: str, got: str) -> bool:
+    """Did we get the family we asked for, or a fallback?
+
+    Compares the family stem rather than the whole name. Pango describes
+    a face by weight and width class, not by its full name, so
+    `Mazzard H Black` legitimately comes back as
+    `Mazzard-Heavy-Semi-Condensed` — the OTF has family "Mazzard",
+    weight 900, width class 4. Insisting on an exact match reports a
+    false failure on a font that is installed and correct.
+
+    What actually needs catching is the family going missing on a fresh
+    machine and the engine silently reaching for a fallback.
+    """
+    return _norm(wanted.split()[0]) in _norm(got)
+
+
+def _norm(s: str) -> str:
+    return "".join(c for c in s.lower() if c.isalnum())
+
+
+def _first_family(var: str) -> str:
+    """The first family named in a custom property in sq.css — the one
+    that is actually wanted, before the fallbacks."""
+    from .render import STYLESHEET
+    css = STYLESHEET.read_text(encoding="utf-8")
+    m = re.search(rf"{re.escape(var)}\s*:\s*([^;]+);", css)
+    if not m:
+        return "?"
+    return m.group(1).split(",")[0].strip().strip('"').strip()
+
+
 # --- PDF checks ------------------------------------------------------------
 
 def embedded_fonts(reader: PdfReader) -> dict:
@@ -315,8 +363,46 @@ def check_pdf(pdf: Path, issue: dict, rep: Report):
     if not missing and not colour:
         rep.note("OK", f"all {len(fonts)} fonts embedded, none of them "
                        f"colour fonts")
+    check_font_families(fonts, issue, rep)
     for k in sorted(fonts):
         print(f"         {k}")
+
+
+def check_font_families(fonts: dict, issue: dict, rep: Report):
+    """Is every embedded family one the stylesheet actually asked for?
+
+    The other font checks answer "did it embed?" and "is it a colour
+    font?" — both of which a silent substitution passes cleanly. Fall
+    2026 went to print with its folios in Times New Roman because a
+    comma-grouped margin-box rule was dropped and the engine fell back
+    to the default serif; every existing check said OK. This is the one
+    that would have caught it.
+
+    Matching is by family stem, the same comparison `sq doctor` makes,
+    so the weight-and-width names Pango emits do not read as strangers.
+    """
+    wanted = [_first_family(var) for _, var, _ in FONT_ROLES]
+    accepted = [str(f) for f in (issue.get("fonts") or {}).get("accept", [])]
+
+    strangers = [k for k in sorted(fonts)
+                 if not any(font_matches(w, k) for w in wanted if w != "?")]
+    if not strangers:
+        rep.note("OK", f"every embedded family is a declared role")
+        return
+
+    for k in strangers:
+        # Same escape hatch as the covers: a family that is genuinely
+        # wanted is recorded once in issue.yaml rather than leaving a
+        # standing FAIL that stops being read.
+        if any(font_matches(a, k) for a in accepted):
+            rep.note("WARN", f"font family not a declared role: {k} "
+                             f"— accepted in issue.yaml")
+        else:
+            rep.note("FAIL", f"font family not a declared role: {k}")
+            print("         nothing in sq.css asks for this — the engine "
+                  "substituted it.")
+            print("         Find what it is setting, or record it under "
+                  "`fonts.accept` in issue.yaml.")
 
 
 def mixam_numbers(pdf: Path, issue: dict):
