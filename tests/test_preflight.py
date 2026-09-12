@@ -241,3 +241,48 @@ def test_accepting_one_family_does_not_excuse_another():
     check_font_families(fonts, {"fonts": {"accept": ["Times New Roman"]}}, rep)
     assert rep.fails == 1
     assert rep.warns == 1
+
+
+# --- placeholders on the about page ------------------------------------------
+
+def _bare(about):
+    return {"articles": [], "about": about}
+
+
+def test_a_todo_on_the_about_page_fails():
+    """`notes` names what is in the issue, so it cannot be written until
+    the articles are in — which makes it the line most likely to still
+    say TODO at upload. It used to be checked nowhere and would have
+    printed as written."""
+    from sq.preflight import Report, check_frontmatter
+    rep = Report()
+    check_frontmatter(_bare({"heading": "Stan Quarterly", "notes": "TODO"}),
+                      rep)
+    assert rep.fails == 1
+
+
+def test_the_failing_about_field_is_named(capsys):
+    """Counting them is no use when the block has a dozen strings in it."""
+    from sq.preflight import Report, check_frontmatter
+    rep = Report()
+    check_frontmatter(_bare({"notes_heading": "About Winter 2027",
+                             "notes": "TODO"}), rep)
+    assert "about.notes" in capsys.readouterr().out
+
+
+def test_a_todo_inside_sections_is_found():
+    """`sections` is a list of dicts, so a one-level scan would miss it."""
+    from sq.preflight import Report, check_frontmatter
+    rep = Report()
+    check_frontmatter(_bare({"sections": [{"heading": "Type", "body": "ok"},
+                                          {"heading": "Paper",
+                                           "body": "TODO"}]}), rep)
+    assert rep.fails == 1
+
+
+def test_an_issue_with_no_about_block_is_fine():
+    """Omitting the block is how you say the page is not wanted."""
+    from sq.preflight import Report, check_frontmatter
+    rep = Report()
+    check_frontmatter({"articles": []}, rep)
+    assert rep.fails == 0

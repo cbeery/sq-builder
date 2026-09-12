@@ -176,3 +176,31 @@ def test_no_stamp_still_uses_todays_date(fake_issues, tmp_path,
                             print_only=True, stamp=None))
     assert [p.name for p in out.glob("*.pdf")] == [
         f"SQ_Sample_{date.today().isoformat()}.pdf"]
+
+
+# --- what `sq new` leaves behind ---------------------------------------------
+
+def test_new_scaffolds_the_about_block(fake_issues, capsys):
+    """The about page is part of the fixed shape of every issue — the
+    build pads forward to land it on the penultimate leaf. Scaffolding an
+    issue without the block meant the page was silently not produced."""
+    import yaml
+    cli.cmd_new(Namespace(slug="2027-spring", name="Spring 2027"))
+    spec = yaml.safe_load(
+        (fake_issues / "2027-spring" / "issue.yaml").read_text())
+    assert "about" in spec, "no about block — the page would not be built"
+    assert spec["about"]["notes_heading"] == "About Spring 2027"
+
+
+def test_a_new_issue_does_not_preflight_until_the_notes_are_written(
+        fake_issues, capsys):
+    """The scaffolded notes say TODO on purpose, and preflight has to be
+    the thing that stops it reaching the printer."""
+    import yaml
+    from sq.preflight import Report, check_frontmatter
+    cli.cmd_new(Namespace(slug="2027-spring", name="Spring 2027"))
+    spec = yaml.safe_load(
+        (fake_issues / "2027-spring" / "issue.yaml").read_text())
+    rep = Report()
+    check_frontmatter({"articles": [], "about": spec["about"]}, rep)
+    assert rep.fails == 1

@@ -215,8 +215,33 @@ def check_frontmatter(issue: dict, rep: Report):
                 rep.note("FAIL", f"{art['slug']}: {field} still has a TODO")
         if not str(art.get("url", "")).startswith(("http://", "https://")):
             rep.note("FAIL", f"{art['slug']}: url is not a URL")
+
+    # The about page is prose too, and the one line on it that cannot be
+    # written in advance — `notes` names what is in the issue — is the
+    # line most likely to still say TODO at upload. It used to be checked
+    # nowhere, so it would have printed as written.
+    for where, v in _strings(issue.get("about") or {}, "about"):
+        if "TODO" in v:
+            todos += 1
+            rep.note("FAIL", f"{where} still has a TODO")
+
     if not todos:
-        rep.note("OK", "no TODO placeholders in any article")
+        rep.note("OK", "no TODO placeholders in any article or on the "
+                       "about page")
+
+
+def _strings(node, path: str):
+    """Every string in the about block, with a readable path to it, so a
+    placeholder can be named rather than just counted. `sections` is a
+    list of dicts, so this has to walk rather than scan one level."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            yield from _strings(v, f"{path}.{k}")
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from _strings(v, f"{path}[{i}]")
+    elif isinstance(node, str):
+        yield path, node
 
 
 def check_glyphs(issue: dict, rep: Report):

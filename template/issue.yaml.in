@@ -52,6 +52,29 @@ theme:
   muted: "#6E6E6E"
   rule: "#D8D8D8"
 
+# The colophon page — how the issue is made. Always the last printed
+# leaf, on a right-hand page, and part of the fixed shape of every issue:
+# the build pads forward to land it there. Omit this block entirely and
+# the page is not produced. `sections` overrides the standard text;
+# `notes` adds a paragraph specific to this issue.
+about:
+  heading: Stan Quarterly
+  subheading: How we made this thing
+  builder_url: github.com/cbeery/sq-builder
+  notes_heading: About ${issue_name}
+  # Write this once the articles are in — it names what is in the issue,
+  # so it cannot be written first. Preflight FAILs while it says TODO.
+  notes: >-
+    TODO
+  # Set pdf_url once the PDF is hosted somewhere and a QR code appears
+  # with the instructions below. Leave it out and neither is drawn.
+  # pdf_url: https://example.com/sq-issue.pdf
+  qr_instructions: >-
+    **To read this on your iPad:** open the Camera app, point it at the
+    square above, and tap the notification that slides down from the top.
+    The whole issue will open in Safari. Tap the share button and choose
+    **Books** to keep a copy on the iPad for good.
+
 # Order here is the order in the magazine and in the contents.
 # `sq add` appends to this list.
 articles:

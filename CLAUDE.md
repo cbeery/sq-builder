@@ -36,7 +36,9 @@ stay that way.
   with a blank verso behind it, then the blank inside the back cover,
   then the back cover — page `T-3`, always one more than a multiple of
   four. Never on the inside back cover. The build pads forward to land it
-  there and the blanks that fall out are fine.
+  there and the blanks that fall out are fine. `sq new` scaffolds the
+  block, with `notes` as a TODO that preflight FAILs on — it names what
+  is in the issue, so it cannot be written until the articles are.
 - **A photograph and its caption never separate across a page.** CSS
   cannot enforce this: floats are laid out with `page_is_empty=True`, so
   `break-inside: avoid` has nowhere to push a float and is ignored. The
@@ -108,9 +110,11 @@ Quirks worked around in `template/sq.css`, all commented in place:
 `sq preflight` must show zero FAILs. It checks image PPI **at placed
 size** (cover art measured after cover-fill scaling), page count, the
 media/trim/bleed boxes, font embedding, **that every embedded family is
-one of the five declared roles**, colour glyphs, missing images and
-TODOs. That family check exists because embedding and colour-font checks
-both pass a silent substitution cleanly — Fall 2026 printed its folios in
+one of the five declared roles**, colour glyphs, missing images, and
+TODOs in both article frontmatter and the about block.
+
+That family check exists because embedding and colour-font checks both
+pass a silent substitution cleanly — Fall 2026 printed its folios in
 Times New Roman and nothing said a word. A family that is genuinely
 wanted goes in `fonts.accept` in the issue's settings, the same way a
 soft cover is accepted, rather than being left as a standing FAIL.
