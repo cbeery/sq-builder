@@ -137,3 +137,42 @@ def test_add_stdout_writes_nothing_and_registers_nothing(tmp_path, capsys,
     assert "bio: # TODO" in out
     assert (issues / "_sample" / "issue.yaml").read_text() == before
     assert len(list((issues / "_sample" / "articles").glob("*.md"))) == n_before
+
+
+# --- a second build on the same day ------------------------------------------
+
+def test_stamp_names_the_pdf_instead_of_today(fake_issues, tmp_path,
+                                              monkeypatch, capsys):
+    """The name is date-stamped, so two builds on one day collide and the
+    second replaces the first. That is fine until the earlier one is part
+    of the record — the file that went to the printer — which is what
+    --stamp is for."""
+    out = tmp_path / "out"
+    monkeypatch.setattr(cli, "OUT", out)
+    rc = cli.cmd_build(Namespace(issue="_sample", watch=False, screen=False,
+                                 print_only=True, stamp="2026-09-12b"))
+    assert rc == 0
+    names = [p.name for p in out.glob("*.pdf")]
+    assert names == ["SQ_Sample_2026-09-12b.pdf"], names
+
+
+def test_a_stamp_cannot_escape_the_out_directory(fake_issues, tmp_path,
+                                                 monkeypatch, capsys):
+    """It lands in a filename, so it has to stay one."""
+    out = tmp_path / "out"
+    monkeypatch.setattr(cli, "OUT", out)
+    rc = cli.cmd_build(Namespace(issue="_sample", watch=False, screen=False,
+                                 print_only=True, stamp="../escaped"))
+    assert rc == 1
+    assert not list(tmp_path.glob("**/*.pdf")), "wrote a file anyway"
+
+
+def test_no_stamp_still_uses_todays_date(fake_issues, tmp_path,
+                                         monkeypatch, capsys):
+    from datetime import date
+    out = tmp_path / "out"
+    monkeypatch.setattr(cli, "OUT", out)
+    cli.cmd_build(Namespace(issue="_sample", watch=False, screen=False,
+                            print_only=True, stamp=None))
+    assert [p.name for p in out.glob("*.pdf")] == [
+        f"SQ_Sample_{date.today().isoformat()}.pdf"]

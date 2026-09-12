@@ -13,6 +13,7 @@ one being worked on.
 
 import argparse
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -159,10 +160,12 @@ def cmd_add(args) -> int:
     return 0
 
 
-def _build(issue_dir: Path, proof: bool, screen: bool = False) -> Path:
+def _build(issue_dir: Path, proof: bool, screen: bool = False,
+           stamp: str | None = None) -> Path:
     from . import render
     t0 = time.time()
-    pdf = render.build(issue_dir, OUT, proof=proof, screen=screen)
+    pdf = render.build(issue_dir, OUT, proof=proof, screen=screen,
+                       stamp=stamp)
     from pypdf import PdfReader
     n = len(PdfReader(str(pdf)).pages)
     print(f"{show(pdf)}  —  {n} pages  {time.time() - t0:.2f}s")
@@ -173,8 +176,19 @@ def cmd_build(args) -> int:
     from . import preflight
     issue_dir = resolve_issue(args.issue)
 
+    # The name is date-stamped, so two builds on one day land on the same
+    # file and the second quietly replaces the first. That is usually what
+    # you want. It is not what you want when the earlier one is part of
+    # the record — the file that went to the printer, say — so --stamp
+    # exists to set the suffix by hand and keep both.
+    stamp = getattr(args, "stamp", None)
+    if stamp and not re.fullmatch(r"[A-Za-z0-9._-]+", stamp):
+        print("error: --stamp may only contain letters, digits, dot, "
+              "dash and underscore")
+        return 1
+
     if getattr(args, "screen", False):
-        pdf = _build(issue_dir, proof=False, screen=True)
+        pdf = _build(issue_dir, proof=False, screen=True, stamp=stamp)
         print("\nSymmetric margins and a folio that stays put — for reading "
               "on a screen.\nDo NOT send this one to the printer; it has no "
               "gutter.")
@@ -184,9 +198,9 @@ def cmd_build(args) -> int:
         # Both, every time. You want the print file to upload and the
         # screen file to send people, and having only one of them in out/
         # is how the wrong one gets sent.
-        pdf = _build(issue_dir, proof=False)
+        pdf = _build(issue_dir, proof=False, stamp=stamp)
         if not args.print_only:
-            _build(issue_dir, proof=False, screen=True)
+            _build(issue_dir, proof=False, screen=True, stamp=stamp)
             print("   print: mirrored gutter — this is the one to upload")
             print("  screen: symmetric margins — this is the one to send")
         print()
@@ -393,6 +407,9 @@ def main(argv=None) -> int:
                         "the printer")
     p.add_argument("--print-only", action="store_true",
                    help="skip the screen build")
+    p.add_argument("--stamp", metavar="SUFFIX",
+                   help="name the PDF with this instead of today's date, "
+                        "to keep a second build made on the same day")
     p.set_defaults(fn=cmd_build)
 
     p = sub.add_parser("preflight", help="check an issue before upload")
