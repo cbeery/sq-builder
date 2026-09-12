@@ -23,6 +23,11 @@ from .content import ContentError, resolve_geometry
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "template"
+# The bundled worked example, and always the builder's own copy. It is
+# what `doctor` renders to prove the toolchain, and what `drill` copies
+# to scaffold a practice run — neither may depend on which content tree
+# happens to be beside the working directory.
+SAMPLE = ROOT / "issues" / "_sample"
 
 
 def show(path: Path) -> str:
@@ -267,10 +272,9 @@ def cmd_drill(args) -> int:
             return 0
         shutil.rmtree(path)
 
-    sample = ISSUES / "_sample"
     (path / "articles").mkdir(parents=True)
-    shutil.copytree(sample / "images", path / "images")
-    text = (sample / "issue.yaml").read_text(encoding="utf-8")
+    shutil.copytree(SAMPLE / "images", path / "images")
+    text = (SAMPLE / "issue.yaml").read_text(encoding="utf-8")
     text = text.split("title:", 1)[1]
     text = ("# A throwaway issue for a practice run. Gitignored — a drill\n"
             "# means pasting real reprinted articles, and those must not\n"
@@ -369,8 +373,8 @@ def cmd_doctor(args) -> int:
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
         try:
-            pdf = render.build(ISSUES / "_sample", Path(tmp))
-            clean = preflight.run(ISSUES / "_sample", pdf)
+            pdf = render.build(SAMPLE, Path(tmp))
+            clean = preflight.run(SAMPLE, pdf)
         except Exception as exc:
             print(f"  [FAIL] sample issue did not build: {exc}")
             clean = False

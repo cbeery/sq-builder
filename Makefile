@@ -12,6 +12,7 @@ help:
 	@echo "make preflight  check before upload; non-zero exit on FAIL"
 	@echo "make proof      render with crop marks, for screen only"
 	@echo "make test       parser and paste-cleaner regression tests"
+	@echo "make clean      drop generated files and proof/screen PDFs"
 	@echo ""
 	@echo "Pass an issue with ISSUE=2026-fall; default is the newest."
 
@@ -36,5 +37,9 @@ proof:
 test:
 	$(PY) -m pytest -q
 
+# Never `rm -rf out`. In the content repo the print-ready PDFs are
+# committed, and a reprint starts from knowing exactly which bytes
+# went to Mixam. Only the regenerable scratch goes.
 clean:
-	rm -rf out issues/*/generated
+	rm -rf issues/*/generated
+	rm -f out/*_proof.pdf out/*_screen.pdf
