@@ -3,7 +3,7 @@
 ISSUE ?=
 PY := .venv/bin/python
 
-.PHONY: help setup build watch preflight proof test clean
+.PHONY: help setup build watch preflight proof test clean distclean
 
 help:
 	@echo "make setup      create .venv and install sq"
@@ -13,6 +13,7 @@ help:
 	@echo "make proof      render with crop marks, for screen only"
 	@echo "make test       parser and paste-cleaner regression tests"
 	@echo "make clean      drop generated files and proof/screen PDFs"
+	@echo "make distclean  also empty out/ — refuses if it holds tracked PDFs"
 	@echo ""
 	@echo "Pass an issue with ISSUE=2026-fall; default is the newest."
 
@@ -43,3 +44,14 @@ test:
 clean:
 	rm -rf issues/*/generated
 	rm -f out/*_proof.pdf out/*_screen.pdf
+
+# Empties out/ outright, which is right here — the builder's out/ is pure
+# scratch — and wrong in the content repo, where the print-ready PDFs are
+# committed. The Makefile can't know which tree it was pointed at, so ask
+# git: anything tracked under out/ means this is not a tree to wipe.
+distclean: clean
+	@if [ -n "$$(git ls-files out)" ]; then \
+		echo "refusing: out/ holds tracked files — wipe it by hand if you mean it"; \
+		exit 1; \
+	fi
+	rm -rf out
