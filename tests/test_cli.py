@@ -178,6 +178,52 @@ def test_no_stamp_still_uses_todays_date(fake_issues, tmp_path,
         f"SQ_Sample_{date.today().isoformat()}.pdf"]
 
 
+def test_preflight_ignores_the_other_issues_pdfs(fake_issues, tmp_path,
+                                                 monkeypatch, capsys):
+    """`out/` holds every issue at once. Preflight used to take the newest
+    PDF in there whatever it was, so a new issue with no build of its own
+    was checked against the last issue's file and passed."""
+    out = tmp_path / "out"
+    monkeypatch.setattr(cli, "OUT", out)
+    cli.cmd_build(Namespace(issue="_sample", watch=False, screen=False,
+                            print_only=True, stamp="2026-09-12"))
+    (sample_pdf,) = out.glob("SQ_Sample_*.pdf")
+
+    # A second issue, newer on disk, with nothing built for it yet. Only
+    # the wordmark is copied in: a missing one is a hard error, where a
+    # missing cover is the FAIL preflight is there to report.
+    cli.cmd_new(Namespace(slug="2027-spring", name="Spring 2027"))
+    art = fake_issues / "2027-spring" / "images"
+    art.mkdir(parents=True, exist_ok=True)
+    shutil.copy(fake_issues / "_sample" / "images" / "mark-placeholder.png",
+                art / "sq-mark.png")
+    capsys.readouterr()                # only the preflight output matters
+    rc = cli.cmd_preflight(Namespace(issue="2027-spring", pdf=None))
+
+    assert rc == 1, "scaffolded notes still say TODO"
+    printed = capsys.readouterr().out
+    assert sample_pdf.name not in printed, "checked another issue's PDF"
+    assert "no PDF given" in printed
+
+
+def test_preflight_takes_the_newest_build_of_its_own_issue(
+        fake_issues, tmp_path, monkeypatch, capsys):
+    """Among its own, the most recent wins — including a hand stamp like
+    `-12b`, which is how a corrected build is kept beside the one that
+    went to the printer."""
+    out = tmp_path / "out"
+    monkeypatch.setattr(cli, "OUT", out)
+    for stamp in ("2026-09-11", "2026-09-12b"):
+        cli.cmd_build(Namespace(issue="_sample", watch=False, screen=False,
+                                print_only=True, stamp=stamp))
+        time.sleep(0.01)          # the pick is by mtime
+    capsys.readouterr()                # the build lines name both files
+    cli.cmd_preflight(Namespace(issue="_sample", pdf=None))
+    printed = capsys.readouterr().out
+    assert "SQ_Sample_2026-09-12b.pdf" in printed
+    assert "SQ_Sample_2026-09-11.pdf" not in printed
+
+
 # --- what `sq new` leaves behind ---------------------------------------------
 
 def test_new_scaffolds_the_about_block(fake_issues, capsys):

@@ -19,8 +19,11 @@ import time
 from pathlib import Path
 from string import Template
 
+import yaml
+
 from . import __version__
 from .content import ContentError, resolve_geometry
+from .render import pdf_prefix
 from .preflight import FONT_ROLES, _first_family, _norm, font_matches
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -232,9 +235,15 @@ def cmd_preflight(args) -> int:
     if args.pdf:
         pdf = Path(args.pdf)
     else:
-        # Newest non-proof PDF for this issue. A proof carries crop marks
-        # and must never be what gets checked, or uploaded.
-        cands = sorted((p for p in OUT.glob("*.pdf")
+        # Newest non-proof PDF FOR THIS ISSUE. `out/` keeps every issue's
+        # builds, so matching on the name is what stops a Winter preflight
+        # reporting a clean bill of health for the Fall file. A proof
+        # carries crop marks and must never be what gets checked, or
+        # uploaded; nor must the screen copy, which has no gutter.
+        spec = yaml.safe_load(
+            (issue_dir / "issue.yaml").read_text(encoding="utf-8")) or {}
+        prefix = pdf_prefix(spec)
+        cands = sorted((p for p in OUT.glob(f"{prefix}*.pdf")
                         if "_proof" not in p.name
                         and "_screen" not in p.name),
                        key=lambda p: p.stat().st_mtime)

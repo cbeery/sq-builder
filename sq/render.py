@@ -429,6 +429,15 @@ def nudge(issue: dict, fid: str) -> bool:
     return True
 
 
+def pdf_prefix(issue: dict) -> str:
+    """The stem every build of one issue shares, e.g. `SQ_Fall_2026_`.
+    `out/` holds every issue side by side, so this is what tells them
+    apart — read it off the raw issue.yaml or a loaded issue, either
+    way, but never spell it out a second time somewhere else."""
+    slug = re.sub(r"[^A-Za-z0-9]+", "_", issue["issue"]).strip("_")
+    return f"{issue.get('abbr', 'SQ')}_{slug}_"
+
+
 def build(issue_dir: Path, out_dir: Path, proof: bool = False,
           stamp: str | None = None, screen: bool = False) -> Path:
     """Render the issue, pad to a multiple of 4, write the PDF, return its
@@ -472,8 +481,7 @@ def build(issue_dir: Path, out_dir: Path, proof: bool = False,
             f"padding failed: {len(doc.pages)} pages is not a multiple of 4")
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    slug = re.sub(r"[^A-Za-z0-9]+", "_", issue["issue"]).strip("_")
-    name = (f"{issue.get('abbr', 'SQ')}_{slug}_"
+    name = (f"{pdf_prefix(issue)}"
             f"{stamp or date.today().isoformat()}"
             f"{'_proof' if proof else ''}{'_screen' if screen else ''}.pdf")
     pdf = out_dir / name
