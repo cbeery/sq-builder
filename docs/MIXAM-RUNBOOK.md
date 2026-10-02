@@ -1,7 +1,7 @@
 # Mixam runbook for Stan Quarterly
 
 Everything between "the PDF is done" and "copies arrive." Written against
-Mixam's US site as of September 2026 — their UI changes, so treat the click
+Mixam's US site as of September 2026 (reorder path re-walked 2 Oct 2026) — their UI changes, so treat the click
 paths as a guide and the rules as the durable part.
 
 ---
@@ -234,6 +234,40 @@ first.
 
 If you reordered pages by dragging thumbnails at any point, un-confirming
 can revert them — fix page order in the source and re-upload instead.
+
+### The reorder as it actually ran (Fall 2026, 2 Oct 2026)
+
+The click path above is from September. This is what the site did when
+Stan's Fall copy was ordered, step by step:
+
+1. **Dashboard → Recent Orders → the proof order → Reorder.** A **modal**
+   opens with the spec, Quantity (check it is **1**), and price cards by
+   ship date. Pick the cheapest card, then **Add to Cart**.
+2. **Cart.** The right-hand "Your Quote" panel shows *Delivery options to
+   <old ZIP>*. **Change ZIP Code** opens an "Enter ZIP Code" box. **That box
+   only prices shipping**; it is not the address. Enter Stan's ZIP and
+   click Apply. The tax line then names his town and county.
+3. **Rewards.** "Use Your Mixam Rewards Points": the box takes an **even**
+   number. 692 points came to $3.46.
+4. **Continue** lands on the pending order (status *Initiated*). The
+   **red panel is a tips carousel** with nothing to click. The
+   **progress bar at the top is the navigation**. Artwork is already
+   ticked, because the reorder cloned the file.
+5. **The delivery address is the account's saved one.** The order page's
+   Addresses section showed Billing (CB) and **Delivery (Stan's saved
+   address)**, each with Edit. Nothing needs typing.
+6. Scroll down: "Print my files unchecked" is carried over, then the UPS
+   option, then the totals. **Delivery options load with a spinner.** The
+   totals box is blank until it finishes.
+7. Confirming flips the page to **"Your Order Is Confirmed (ready for
+   production)"**, and an email `[Mixam][MX<order>] - Confirmation`
+   follows.
+
+**Price, 2 Oct 2026: the print line was $41.00 for one copy**, against
+$10.00 for the identical spec on 11 Sep. Total with UPS 3 Day Select and
+IN tax came to $55.57 after points. Expect a single copy to cost about
+four times what Summer did, until that is explained. Alternatives are
+priced in `sq-content/issues/2026-fall/mixam.md`.
 
 ## Ordering, step by step
 
